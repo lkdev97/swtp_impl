@@ -1,7 +1,6 @@
 package de.thm.swtp.statediagram;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class StateNode extends Node {
 
@@ -19,16 +18,15 @@ public class StateNode extends Node {
         this.endState = endState;
     }
 
-    private final HashMap<String, StateNode> edges = new HashMap<>();
-    private final ArrayList<StateNode> emptyEdges = new ArrayList<>();
+    private final ArrayList<Edge> edges = new ArrayList<>();
     private final ArrayList<StateNode> stateNodes = new ArrayList<>();
 
     public void addEdge(String trigger, StateNode node) {
-        edges.put(trigger, node);
+        edges.add(new Edge(node, trigger));
     }
 
     public void addEmptyEdge(StateNode node) {
-        emptyEdges.add(node);
+        edges.add(new Edge(node));
     }
 
     public void addStateNode(StateNode node) {
@@ -45,6 +43,14 @@ public class StateNode extends Node {
 
     public void setEndState(boolean endState) {
         this.endState = endState;
+    }
+
+    public Edge getLastEdge() {
+        if (edges.isEmpty()) {
+            return null;
+        } else {
+            return edges.get(edges.size() - 1);
+        }
     }
 
     public int getId() {
@@ -89,19 +95,18 @@ public class StateNode extends Node {
     public String toString() {
         var s = new StringBuilder();
 
-        for (var e : edges.entrySet()) {
-            var state = e.getValue();
-            s.append(generateState(state, e.getKey()));
-            s.append(state);
+        for (var e : edges) {
+            var representation = e.getStringRepresentation();
+            if (representation != null) {
+                s.append(generateState(e.getState(), representation));
+            } else {
+                s.append(generateState(e.getState()));
+            }
+            s.append(e.getState());
         }
 
         for (var n : stateNodes) {
             s.append(n);
-        }
-
-        for (var state : emptyEdges) {
-            s.append(generateState(state));
-            s.append(state);
         }
 
         return s.toString();

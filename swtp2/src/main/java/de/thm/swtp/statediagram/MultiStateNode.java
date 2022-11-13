@@ -1,12 +1,10 @@
 package de.thm.swtp.statediagram;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MultiStateNode extends StateNode {
 
-    private final HashMap<String, StateNode> edges = new HashMap<>();
-    private final ArrayList<StateNode> emptyEdges = new ArrayList<>();
+    private final ArrayList<Edge> edges = new ArrayList<>();
     private boolean finalized = false;
 
     public MultiStateNode(int id) {
@@ -16,7 +14,7 @@ public class MultiStateNode extends StateNode {
     @Override
     public void addEdge(String trigger, StateNode node) {
         if (finalized) {
-            edges.put(trigger, node);
+            edges.add(new Edge(node, trigger));
         } else {
             super.addEdge(trigger, node);
         }
@@ -25,7 +23,7 @@ public class MultiStateNode extends StateNode {
     @Override
     public void addEmptyEdge(StateNode node) {
         if (finalized) {
-            emptyEdges.add(node);
+            edges.add(new Edge(node));
         } else {
             super.addEmptyEdge(node);
         }
@@ -43,15 +41,14 @@ public class MultiStateNode extends StateNode {
         s.append(super.toString());
         s.append("}\n");
 
-        for (var e : edges.entrySet()) {
-            var state = e.getValue();
-            s.append(generateState(state, e.getKey()));
-            s.append(state);
-        }
-
-        for (var state : emptyEdges) {
-            s.append(generateState(state));
-            s.append(state);
+        for (var e : edges) {
+            var representation = e.getStringRepresentation();
+            if (representation != null) {
+                s.append(generateState(e.getState(), representation));
+            } else {
+                s.append(generateState(e.getState()));
+            }
+            s.append(e.getState());
         }
 
         return s.toString();
