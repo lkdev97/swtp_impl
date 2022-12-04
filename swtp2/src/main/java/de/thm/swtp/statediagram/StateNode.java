@@ -7,6 +7,8 @@ public class StateNode extends Node {
     final int id;
     private final boolean startState;
     private boolean endState;
+    private final ArrayList<Edge> edges = new ArrayList<>();
+    private final ArrayList<StateNode> stateNodes = new ArrayList<>();
 
     public StateNode(int id) {
         this(id, false, false);
@@ -17,9 +19,6 @@ public class StateNode extends Node {
         this.startState = startState;
         this.endState = endState;
     }
-
-    private final ArrayList<Edge> edges = new ArrayList<>();
-    private final ArrayList<StateNode> stateNodes = new ArrayList<>();
 
     public void addEdge(String trigger, StateNode node) {
         edges.add(new Edge(node, trigger));
@@ -43,14 +42,6 @@ public class StateNode extends Node {
 
     public void setEndState(boolean endState) {
         this.endState = endState;
-    }
-
-    public Edge getLastEdge() {
-        if (edges.isEmpty()) {
-            return null;
-        } else {
-            return edges.get(edges.size() - 1);
-        }
     }
 
     public int getId() {

@@ -4,33 +4,14 @@ import java.util.ArrayList;
 
 public class MultiStateNode extends StateNode {
 
-    private final ArrayList<Edge> edges = new ArrayList<>();
-    private boolean finalized = false;
+    private final ArrayList<StateNode> innerStates = new ArrayList<>();
 
     public MultiStateNode(int id) {
         super(id);
     }
 
-    @Override
-    public void addEdge(String trigger, StateNode node) {
-        if (finalized) {
-            edges.add(new Edge(node, trigger));
-        } else {
-            super.addEdge(trigger, node);
-        }
-    }
-
-    @Override
-    public void addEmptyEdge(StateNode node) {
-        if (finalized) {
-            edges.add(new Edge(node));
-        } else {
-            super.addEmptyEdge(node);
-        }
-    }
-
-    public void setFinalized() {
-        this.finalized = true;
+    public void addInnerState(StateNode node) {
+        innerStates.add(node);
     }
 
     @Override
@@ -38,18 +19,12 @@ public class MultiStateNode extends StateNode {
         var s = new StringBuilder();
 
         s.append(String.format("state S%s {\n", id));
-        s.append(super.toString());
+        for (var e : innerStates) {
+            s.append(e.toString());
+        }
         s.append("}\n");
 
-        for (var e : edges) {
-            var representation = e.getStringRepresentation();
-            if (representation != null) {
-                s.append(generateState(e.getState(), representation));
-            } else {
-                s.append(generateState(e.getState()));
-            }
-            s.append(e.getState());
-        }
+        s.append(super.toString());
 
         return s.toString();
     }

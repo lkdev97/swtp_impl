@@ -66,7 +66,7 @@ public class Transformer {
     private void generateBranch(StateNode baseState, StateNode endState) {
         var branchState = new MultiStateNode(stateId++);
         var currentState = new StateNode(stateId, true, false);
-        branchState.addStateNode(currentState);
+        branchState.addInnerState(currentState);
         baseState.addEdge(((Grouping) currentEvent).getComment(), branchState);
 
         nextEvent();
@@ -76,7 +76,6 @@ public class Transformer {
         }
 
         currentState.setEndState(true);
-        branchState.setFinalized();
         branchState.addEmptyEdge(endState);
     }
 
@@ -84,7 +83,7 @@ public class Transformer {
         var wrapperState = new MultiStateNode(stateId++);
 
         var startState = new StateNode(stateId++, true, false);
-        wrapperState.addStateNode(startState);
+        wrapperState.addInnerState(startState);
         var baseState = new StateNode(stateId++);
         startState.addEmptyEdge(baseState);
         var endState = new StateNode(stateId++, false, true);
@@ -98,8 +97,6 @@ public class Transformer {
         }
 
         nextEvent();
-
-        wrapperState.setFinalized();
 
         return wrapperState;
     }
