@@ -1,44 +1,71 @@
 @startuml
 hide empty description
-state GasPump {
+state CoffeeMachineControllerImpl {
 [*] --> S1
-S1 --> S2: insertCard
-S2 --> S3: / requestPin
-S3 --> S4: pinCode
-S4 --> S5: / validate
-S5 --> S6: result(pinOK)
-state S6 {
-[*] --> S8
-S8 --> S10: pinOk
-state S10 {
-[*] --> S12: result(pinOK)
-S12 --> [*]
+S1 --> S2: switch_on_off()
+S2 --> S3: / set_time(5)
+state S3 {
+[*] --> S5
+S5 --> S7: set_time(5)
+state S7 {
+[*] --> S9: / set_on()
+S9 --> [*]
 }
-S10 --> [*]
-S8 --> S14: !pinOk
-state S14 {
-[*] --> S16
-state S16 {
-[*] --> S18
-S18 --> S20: pinOk
-state S20 {
-[*] --> S22: / startFuel
-S22 --> S23: hangUp
-S23 --> [*]
+S7 --> [*]
 }
-S20 --> [*]
-S18 --> S25: !pinOk
-state S25 {
-[*] --> S27: / invalidPin
-S27 --> [*]
+S3 --> S11: / set_heater_on()
+state S11 {
+[*] --> S13
+S13 --> S15: m_CMC.coffee_machine_model.getTime()>0
+state S15 {
+[*] --> S17: / count_down()
+S17 --> S18: / getTime()
+S18 --> S19: / sub_time()
+S19 --> [*]
 }
-S25 --> [*]
+S15 --> [*]
 }
-S16 --> [*]
-}
-S14 --> [*]
-}
-S6 --> S30: / cardOut
+S11 --> S21: / count_down()
+S21 --> S22: / getTime()
+S22 --> S23: / getMode()
+S23 --> S24: / m_CMC.coffee_machine_model.getMode().equals(EMode.NEUTRAL)
+state S24 {
+[*] --> S26
+S26 --> S28: m_CMC.coffee_machine_model.getTime()==0 && m_CMC.coffee_machine_model.getMode().equals(EMode.NEUTRAL)
+state S28 {
+[*] --> S30: / m_CMC.set_heater_off()
 S30 --> [*]
+}
+S28 --> [*]
+}
+S24 --> S32: switch_to_mode_steam_water()
+S32 --> S33: / set_mode_steam_water()
+S33 --> S34: / set_time(5)
+state S34 {
+[*] --> S36
+S36 --> S38: m_CMC.set_time(5)
+state S38 {
+[*] --> S40: / m_CMC.set_pump_on()
+S40 --> [*]
+}
+S38 --> [*]
+}
+S34 --> S42
+state S42 {
+[*] --> S44
+S44 --> S46: m_CMC.coffee_machine_model.getTime()>0
+state S46 {
+[*] --> S48: / count_down()
+S48 --> S49: / getTime()
+S49 --> S50: / sub_time()
+S50 --> [*]
+}
+S46 --> [*]
+}
+S42 --> S52: switch_on_off()
+S52 --> S53: / set_off()
+S53 --> S54: / set_pump_off()
+S54 --> S55: / set_heater_off()
+S55 --> [*]
 }
 @enduml

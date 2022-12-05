@@ -49,11 +49,23 @@ public class Transformer {
     }
 
     private StateNode generateState() {
-        if (currentEvent instanceof GroupingStart) {
-            return generateGroup();
+        if (currentEvent instanceof GroupingStart g) {
+            return switch (g.getTitle()) {
+                case "alt" -> generateAlt();
+                case "loop" -> generateLoop();
+                case "opt" -> generateOpt();
+            }
         } else {
             return new StateNode(stateId++);
         }
+    }
+
+    private StateNode generateLoop() {
+        return null;
+    }
+
+    private StateNode generateOpt() {
+        return null;
     }
 
     private StateNode generate(StateNode target) {
@@ -84,7 +96,7 @@ public class Transformer {
         branchState.addEmptyEdge(endState);
     }
 
-    private StateNode generateGroup() {
+    private StateNode generateAlt() {
         var wrapperState = new MultiStateNode(stateId++);
 
         var startState = new StateNode(stateId++, true, false);
