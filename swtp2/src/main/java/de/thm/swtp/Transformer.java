@@ -39,28 +39,29 @@ public class Transformer {
                 trigger = String.format("/ %s", trigger);
             }
 
-            StateNode s;
-            if (currentEvent instanceof GroupingStart) {
-                s = generateGroup();
-                target.addEdge(trigger, s);
-            } else {
-                s = new StateNode(stateId++);
-                target.addEdge(trigger, s);
-            }
+            var s = generateState();
+            target.addEdge(trigger, s);
+
             return s;
         } else {
             return target;
         }
     }
 
+    private StateNode generateState() {
+        if (currentEvent instanceof GroupingStart) {
+            return generateGroup();
+        } else {
+            return new StateNode(stateId++);
+        }
+    }
+
     private StateNode generate(StateNode target) {
         if (currentEvent instanceof Message) {
             return generateMessage(target);
-        } else if (currentEvent instanceof GroupingStart) {
-            return generateGroup();
+        } else {
+            return generateState();
         }
-
-        throw new IllegalStateException();
     }
 
     private void generateBranch(StateNode baseState, StateNode endState) {
@@ -88,12 +89,8 @@ public class Transformer {
         startState.addEmptyEdge(baseState);
         var endState = new StateNode(stateId++, false, true);
 
-        while (true) {
+        while (!(currentEvent instanceof GroupingLeaf g && g.getType() == GroupingType.END)) {
             generateBranch(baseState, endState);
-
-            if (currentEvent instanceof GroupingLeaf g && g.getType() == GroupingType.END) {
-                break;
-            }
         }
 
         nextEvent();
@@ -103,8 +100,8 @@ public class Transformer {
 
     private DiagramNode generateDiagram() {
         var startState = new StateNode(stateId++, true, false);
-        var target = new StateNode(stateId++);
-        startState.addEmptyEdge(target);
+        var target = generate(startState);
+        //startState.addEmptyEdge(target);
 
         var stateDiagram = new DiagramNode(startState, targetParticipant.getCode());
 

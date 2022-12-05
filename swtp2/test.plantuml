@@ -1,26 +1,25 @@
 @startuml
 hide empty description
 state GasPump {
-[*] --> S1
-S1 --> S2: insertCard
-S2 --> S3: / requestPin
-S3 --> S4: pinCode
-S4 --> S5: / validate
-S5 --> S6: result(pinOK)
-state S6 {
-[*] --> S8
-S8 --> S10: pinOk
-state S10 {
-[*] --> S11: / startFuel
-S11 --> [*]: hangUp
+[*] --> S1: insertCard
+S1 --> S2: / requestPin
+S2 --> S3: pinCode
+S3 --> S4: / validate
+S4 --> S5: result(pinOK)
+state S5 {
+[*] --> S7
+S7 --> S9: pinOk
+state S9 {
+[*] --> S10: / startFuel
+S10 --> [*]: hangUp
 }
-S10 --> [*]
-S8 --> S13: !pinOk
-state S13 {
+S9 --> [*]
+S7 --> S12: !pinOk
+state S12 {
 [*] --> [*]: / invalidPin
 }
-S13 --> [*]
+S12 --> [*]
 }
-S6 --> [*]: / cardOut
+S5 --> [*]: / cardOut
 }
 @enduml
