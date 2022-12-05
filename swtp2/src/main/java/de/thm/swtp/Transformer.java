@@ -59,24 +59,28 @@ public class Transformer {
     private StateNode generate(StateNode target) {
         if (currentEvent instanceof Message) {
             return generateMessage(target);
-        } else {
-            return generateState();
+        } else {;
+            var s = generateState();
+            target.addEmptyEdge(s);
+            return s;
         }
     }
 
     private void generateBranch(StateNode baseState, StateNode endState) {
         var branchState = new MultiStateNode(stateId++);
-        var currentState = new StateNode(stateId, true, false);
+        var currentState = new StateNode(stateId++, true, false);
         branchState.addInnerState(currentState);
         baseState.addEdge(((Grouping) currentEvent).getComment(), branchState);
 
         nextEvent();
 
-        while (!(currentEvent instanceof Grouping)) {
+        while (!(currentEvent instanceof Grouping g && (g.getType() == GroupingType.END || g.getType() == GroupingType.ELSE))) {
             currentState = generate(currentState);
         }
 
-        currentState.setEndState(true);
+        var innerEndState = new StateNode(stateId++, false, true);
+        currentState.addEmptyEdge(innerEndState);
+
         branchState.addEmptyEdge(endState);
     }
 
@@ -100,8 +104,9 @@ public class Transformer {
 
     private DiagramNode generateDiagram() {
         var startState = new StateNode(stateId++, true, false);
-        var target = generate(startState);
-        //startState.addEmptyEdge(target);
+        var idleState = new StateNode(stateId++);
+        startState.addEmptyEdge(idleState);
+        var target = generate(idleState);
 
         var stateDiagram = new DiagramNode(startState, targetParticipant.getCode());
 
@@ -109,7 +114,8 @@ public class Transformer {
             target = generate(target);
         }
 
-        target.setEndState(true);
+        var endState = new StateNode(stateId++, false, true);
+        target.addEmptyEdge(endState);
 
         return stateDiagram;
     }

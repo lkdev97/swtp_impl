@@ -28,10 +28,6 @@ public class StateNode extends Node {
         edges.add(new Edge(node));
     }
 
-    public void addStateNode(StateNode node) {
-        stateNodes.add(node);
-    }
-
     public boolean isStartState() {
         return startState;
     }

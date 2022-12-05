@@ -5,10 +5,14 @@ User -> GasPump: pinCode
 GasPump -> Bank: validate
 Bank -> GasPump: result(pinOK)
 alt pinOk
+Bank -> GasPump: result(pinOK)
+else !pinOk
+alt pinOk
 GasPump -> User: startFuel
 User -> GasPump: hangUp
 else !pinOk
 GasPump -> User: invalidPin
+end
 end
 GasPump -> User: cardOut
 @enduml
