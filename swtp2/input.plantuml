@@ -1,60 +1,14 @@
-@startuml CoffeeMachine_sequence_tea
-skinparam Style strictuml
-skinparam SequenceMessageAlignment center
-autonumber "0:"
-participant CoffeeMachineSequences [
-    =CoffeeMachineSequences
-    ----
-    a
-]
-participant CoffeeMachineControllerImpl  [
-    =CoffeeMachineControllerImpl
-    ----
-    m_CMC
-]
-participant CoffeeMachineModel [
-    =CoffeeMachineModel
-    ----
-    coffee_machine_model
-]
-CoffeeMachineSequences -> CoffeeMachineControllerImpl : switch_on_off()
-'activate CoffeeMachineSequences
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_time(5)
-alt set_time(5)
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_on()
+@startuml test
+User -> GasPump: insertCard
+GasPump -> User: requestPin
+User -> GasPump: pinCode
+GasPump -> Bank: validate
+Bank -> GasPump: result(pinOK)
+alt pinOk
+GasPump -> User: startFuel
+User -> GasPump: hangUp
+else !pinOk
+GasPump -> User: invalidPin
 end
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_heater_on()
-loop m_CMC.coffee_machine_model.getTime()>0
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : count_down()
-    CoffeeMachineControllerImpl -> CoffeeMachineModel : getTime()
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : sub_time()
-end
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : count_down()
-CoffeeMachineControllerImpl -> CoffeeMachineModel : getTime()
-CoffeeMachineControllerImpl -> CoffeeMachineModel : getMode()
-CoffeeMachineControllerImpl -> CoffeeMachineModel : m_CMC.coffee_machine_model.getMode().equals(EMode.NEUTRAL)
-alt m_CMC.coffee_machine_model.getTime()==0 && m_CMC.coffee_machine_model.getMode().equals(EMode.NEUTRAL)
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : m_CMC.set_heater_off()
-end
-
-CoffeeMachineSequences -> CoffeeMachineControllerImpl : switch_to_mode_steam_water()
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_mode_steam_water()
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_time(5)
-
-alt m_CMC.set_time(5)
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : m_CMC.set_pump_on()
-end
-
-loop m_CMC.coffee_machine_model.getTime()>0
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : count_down()
-    CoffeeMachineControllerImpl -> CoffeeMachineModel : getTime()
-    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : sub_time()
-end
-
-CoffeeMachineSequences -> CoffeeMachineControllerImpl : switch_on_off()
-'deactivate CoffeeMachineSequences
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_off()
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_pump_off()
-CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_heater_off()
-
+GasPump -> User: cardOut
 @enduml

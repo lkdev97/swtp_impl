@@ -54,7 +54,8 @@ public class Transformer {
                 case "alt" -> generateAlt();
                 case "loop" -> generateLoop();
                 case "opt" -> generateOpt();
-            }
+                default -> throw new IllegalStateException(String.format("Group type %s not implemented", g.getTitle()));
+            };
         } else {
             return new StateNode(stateId++);
         }
@@ -71,7 +72,7 @@ public class Transformer {
     private StateNode generate(StateNode target) {
         if (currentEvent instanceof Message) {
             return generateMessage(target);
-        } else {;
+        } else {
             var s = generateState();
             target.addEmptyEdge(s);
             return s;

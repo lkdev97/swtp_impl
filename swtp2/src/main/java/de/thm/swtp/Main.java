@@ -30,7 +30,7 @@ public class Main {
         var reader = new SourceStringReader(code);
         var sequenceDiagram = (SequenceDiagram) reader.getBlocks().get(0).getDiagram();
 
-        var transformer = new Transformer(sequenceDiagram, "CoffeeMachineControllerImpl");
+        var transformer = new Transformer(sequenceDiagram, "GasPump");
 
         writeFile("./test.plantuml", transformer.transform().toString());
     }
