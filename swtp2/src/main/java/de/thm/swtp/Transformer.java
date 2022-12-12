@@ -66,7 +66,18 @@ public class Transformer {
     }
 
     private StateNode generateOpt() {
-        return null;
+        var wrapperState = new MultiStateNode(stateId++);
+        var startState = new StateNode(stateId++, true, false);
+        wrapperState.addInnerState(startState);
+        var endState = new StateNode(stateId++, false, true);
+
+        startState.addEdge("!" + ((Grouping) currentEvent).getComment(), endState);
+
+        generateBranch(startState, endState);
+
+        nextEvent();
+
+        return wrapperState;
     }
 
     private StateNode generate(StateNode target) {
