@@ -71,7 +71,7 @@ public class Transformer {
         wrapperState.addInnerState(startState);
         var endState = new StateNode(stateId++, false, true);
 
-        startState.addEdge("!" + ((Grouping) currentEvent).getComment(), endState);
+        startState.addEdge("!(" + ((Grouping) currentEvent).getComment() + ")", endState);
 
         generateBranch(startState, endState);
 
