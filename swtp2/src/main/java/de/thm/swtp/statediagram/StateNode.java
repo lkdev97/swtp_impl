@@ -10,12 +10,14 @@ public class StateNode extends Node {
     private final ArrayList<Edge> edges = new ArrayList<>();
     private final ArrayList<StateNode> stateNodes = new ArrayList<>();
 
-    public StateNode(int id) {
-        this(id, false, false);
+    private static int stateId = 0;
+
+    public StateNode() {
+        this(false, false);
     }
 
-    public StateNode(int id, boolean startState, boolean endState) {
-        this.id = id;
+    public StateNode(boolean startState, boolean endState) {
+        this.id = stateId++;
         this.startState = startState;
         this.endState = endState;
     }

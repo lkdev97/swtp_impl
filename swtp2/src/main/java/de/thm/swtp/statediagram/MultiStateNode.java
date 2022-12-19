@@ -6,10 +6,6 @@ public class MultiStateNode extends StateNode {
 
     private final ArrayList<StateNode> innerStates = new ArrayList<>();
 
-    public MultiStateNode(int id) {
-        super(id);
-    }
-
     public void addInnerState(StateNode node) {
         innerStates.add(node);
     }

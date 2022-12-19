@@ -57,7 +57,7 @@ public class Transformer {
                 default -> throw new IllegalStateException(String.format("Group type %s not implemented", g.getTitle()));
             };
         } else {
-            return new StateNode(stateId++);
+            return new StateNode();
         }
     }
 
@@ -66,10 +66,10 @@ public class Transformer {
     }
 
     private StateNode generateOpt() {
-        var wrapperState = new MultiStateNode(stateId++);
-        var startState = new StateNode(stateId++, true, false);
+        var wrapperState = new MultiStateNode();
+        var startState = new StateNode(true, false);
         wrapperState.addInnerState(startState);
-        var endState = new StateNode(stateId++, false, true);
+        var endState = new StateNode(false, true);
 
         startState.addEdge("!(" + ((Grouping) currentEvent).getComment() + ")", endState);
 
@@ -91,8 +91,8 @@ public class Transformer {
     }
 
     private void generateBranch(StateNode baseState, StateNode endState) {
-        var branchState = new MultiStateNode(stateId++);
-        var currentState = new StateNode(stateId++, true, false);
+        var branchState = new MultiStateNode();
+        var currentState = new StateNode(true, false);
         branchState.addInnerState(currentState);
         baseState.addEdge(((Grouping) currentEvent).getComment(), branchState);
 
@@ -102,20 +102,20 @@ public class Transformer {
             currentState = generate(currentState);
         }
 
-        var innerEndState = new StateNode(stateId++, false, true);
+        var innerEndState = new StateNode(false, true);
         currentState.addEmptyEdge(innerEndState);
 
         branchState.addEmptyEdge(endState);
     }
 
     private StateNode generateAlt() {
-        var wrapperState = new MultiStateNode(stateId++);
+        var wrapperState = new MultiStateNode();
 
-        var startState = new StateNode(stateId++, true, false);
+        var startState = new StateNode(true, false);
         wrapperState.addInnerState(startState);
-        var baseState = new StateNode(stateId++);
+        var baseState = new StateNode();
         startState.addEmptyEdge(baseState);
-        var endState = new StateNode(stateId++, false, true);
+        var endState = new StateNode(false, true);
 
         while (!(currentEvent instanceof GroupingLeaf g && g.getType() == GroupingType.END)) {
             generateBranch(baseState, endState);
@@ -127,8 +127,8 @@ public class Transformer {
     }
 
     private DiagramNode generateDiagram() {
-        var startState = new StateNode(stateId++, true, false);
-        var idleState = new StateNode(stateId++);
+        var startState = new StateNode(true, false);
+        var idleState = new StateNode();
         startState.addEmptyEdge(idleState);
         var target = generate(idleState);
 
@@ -138,7 +138,7 @@ public class Transformer {
             target = generate(target);
         }
 
-        var endState = new StateNode(stateId++, false, true);
+        var endState = new StateNode(false, true);
         target.addEmptyEdge(endState);
 
         return stateDiagram;
