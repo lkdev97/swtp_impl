@@ -23,10 +23,6 @@ public class Edge {
     }
 
     public String getStringRepresentation() {
-        if (trigger == null) {
-            return null;
-        }
-
         return trigger;
     }
 }

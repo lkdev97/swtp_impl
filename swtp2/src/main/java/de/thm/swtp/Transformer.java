@@ -62,7 +62,33 @@ public class Transformer {
     }
 
     private StateNode generateLoop() {
-        return null;
+        var outerWrapperState = new MultiStateNode();
+        var outerStartState = new StateNode(true, false);
+        outerWrapperState.addInnerState(outerStartState);
+
+        var innerWrapperState = new MultiStateNode();
+        outerStartState.addEmptyEdge(innerWrapperState);
+        var innerStartState = new StateNode(true, false);
+        innerWrapperState.addInnerState(innerStartState);
+        var innerEndState = new StateNode(false, true);
+        var exitState = new StateNode(false, true);
+
+        var guard = ((Grouping) currentEvent).getComment();
+        nextEvent();
+        var currentState = new StateNode();
+        innerStartState.addEmptyEdge(currentState);
+        while (!(currentEvent instanceof Grouping g && (g.getType() == GroupingType.END || g.getType() == GroupingType.ELSE))) {
+            currentState = generate(currentState);
+        }
+
+        nextEvent();
+
+        currentState.addEmptyEdge(innerEndState);
+
+        innerWrapperState.addEdge(guard, innerWrapperState);
+        innerWrapperState.addEdge("!(" + guard + ")", exitState);
+
+        return outerWrapperState;
     }
 
     private StateNode generateOpt() {

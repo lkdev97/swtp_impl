@@ -4,13 +4,12 @@ import java.util.ArrayList;
 
 public class StateNode extends Node {
 
-    final int id;
+    protected int id;
     private final boolean startState;
-    private boolean endState;
+    private final boolean endState;
     private final ArrayList<Edge> edges = new ArrayList<>();
-    private final ArrayList<StateNode> stateNodes = new ArrayList<>();
 
-    private static int stateId = 0;
+    protected static int stateId = 0;
 
     public StateNode() {
         this(false, false);
@@ -36,14 +35,6 @@ public class StateNode extends Node {
 
     public boolean isEndState() {
         return endState;
-    }
-
-    public void setEndState(boolean endState) {
-        this.endState = endState;
-    }
-
-    public int getId() {
-        return id;
     }
 
     private StringBuilder generateStateHead(StateNode state) {
@@ -92,10 +83,6 @@ public class StateNode extends Node {
                 s.append(generateState(e.getState()));
             }
             s.append(e.getState());
-        }
-
-        for (var n : stateNodes) {
-            s.append(n);
         }
 
         return s.toString();
