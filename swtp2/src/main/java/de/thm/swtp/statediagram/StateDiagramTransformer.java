@@ -1,22 +1,18 @@
-package de.thm.swtp;
+package de.thm.swtp.statediagram;
 
-import de.thm.swtp.statediagram.DiagramNode;
-import de.thm.swtp.statediagram.MultiStateNode;
-import de.thm.swtp.statediagram.StateNode;
 import net.sourceforge.plantuml.sequencediagram.*;
 
 import java.util.Iterator;
 
-public class Transformer {
+public class StateDiagramTransformer {
 
     private final SequenceDiagram sequenceDiagram;
     private final String targetParticipantName;
     private Iterator<Event> eventIterator;
     private Event currentEvent;
-    private int stateId = 0;
     private Participant targetParticipant;
 
-    public Transformer(SequenceDiagram sequenceDiagram, String targetParticipantName) {
+    public StateDiagramTransformer(SequenceDiagram sequenceDiagram, String targetParticipantName) {
         this.sequenceDiagram = sequenceDiagram;
         this.targetParticipantName = targetParticipantName;
     }

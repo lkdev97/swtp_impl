@@ -1,14 +1,29 @@
-@startuml test
-User -> GasPump: insertCard
-GasPump -> User: requestPin
-User -> GasPump: pinCode
-GasPump -> Bank: validate
-Bank -> GasPump: result(pinOK)
-alt pinOk
-GasPump -> User: startFuel
-User -> GasPump: hangUp
-else !pinOk
-GasPump -> User: invalidPin
+@startuml CoffeeMachine_sequence_on_off
+skinparam Style strictuml
+skinparam SequenceMessageAlignment center
+autonumber "0:"
+participant CoffeeMachineSequences [
+    =CoffeeMachineSequences
+    ----
+    a
+]
+participant CoffeeMachineControllerImpl  [
+    =CoffeeMachineControllerImpl
+    ----
+    m_CMC
+]
+
+CoffeeMachineSequences -> CoffeeMachineControllerImpl : switch_on_off()
+'activate CoffeeMachineSequences
+CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_time(5)
+
+alt set_time(5)
+    CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_on()
 end
-GasPump -> User: cardOut
+CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_heater_on()
+
+CoffeeMachineSequences -> CoffeeMachineControllerImpl : switch_on_off()
+'deactivate CoffeeMachineSequences
+CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_off()
+CoffeeMachineControllerImpl -> CoffeeMachineControllerImpl : set_heater_off()
 @enduml

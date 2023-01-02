@@ -1,6 +1,9 @@
 package de.thm.swtp;
 
+import de.thm.swtp.classdiagram.ClassDiagramValidator;
+import de.thm.swtp.statediagram.StateDiagramTransformer;
 import net.sourceforge.plantuml.SourceStringReader;
+import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.sequencediagram.*;
 
 import java.io.IOException;
@@ -26,12 +29,17 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        var code = readFile("./input.plantuml");
-        var reader = new SourceStringReader(code);
-        var sequenceDiagram = (SequenceDiagram) reader.getBlocks().get(0).getDiagram();
+        var classDiagramCode = readFile("./classdiagram.plantuml");
+        var sequenceDiagramCode = readFile("./input.plantuml");
 
-        var transformer = new Transformer(sequenceDiagram, "GasPump");
+        var classDiagram = (ClassDiagram) new SourceStringReader(classDiagramCode).getBlocks().get(0).getDiagram();
+        var sequenceDiagram = (SequenceDiagram) new SourceStringReader(sequenceDiagramCode).getBlocks().get(0).getDiagram();
 
-        writeFile("./test.plantuml", transformer.transform().toString());
+        var classDiagramReader = new ClassDiagramValidator(classDiagram, sequenceDiagram);
+        var stateDiagramTransformer = new StateDiagramTransformer(sequenceDiagram, "CoffeeMachineControllerImpl");
+
+        classDiagramReader.validate();
+
+        writeFile("./test.plantuml", stateDiagramTransformer.transform().toString());
     }
 }

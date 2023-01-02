@@ -1,0 +1,156 @@
+@startuml
+'package CoffeeMachine <<Node>>{
+'    class CoffeeMachineController
+'    class CoffeeMachineModel
+'    class CoffeeMachineControllerImpl
+'    class CoffeeMachineView
+'}
+
+'package "package CoffeeMachine" <<Node>> {
+'}
+
+class CoffeeMachineController {
+    #{static} CoffeeMachineModel coffee_machine_model=new CoffeeMachineModel
+    '+ switch_on_off(): boolean
+    +boolean switch_on_off()
+    +boolean switch_steam_water()
+    +boolean switch_to_mode_coffee()
+    +boolean switch_to_mode_neutral()
+    +boolean switch_to_mode_steam_water()
+    +boolean count_down()
+    +CoffeeMachineModel {abstract} getCoffee_machine_model()
+    +void OnDebugMessage(String str)
+    +void set_on()
+    +void set_off()
+    +void set_heater_on()
+    +void set_heater_off()
+    +boolean set_time(int seconds)
+    +void sub_time()
+    +void set_mode_coffee()
+    +void set_mode_neutral()
+    +void set_mode_steam_water()
+    +void set_pump_on()
+    +void set_pump_off()
+    +void set_steam()
+    +void set_water()
+}
+
+class CoffeeMachineModel implements Observable {
+    -Observer observer_list
+    -int time = 0
+    -boolean heater = false
+    -boolean pump = false
+    -EMode mode = mode = EMode.NEUTRAL
+    -boolean on = false
+    -boolean steam = false
+    '-steam: boolean = false
+    '+setTime(): void
+    +void setTime(int time)
+    +int getTime()
+    +void setMode(EMode mode)
+    +EMode getMode()
+    +void setPump(boolean pump)
+    +boolean isPump()
+    +void setHeater(boolean heater)
+    +boolean isHeater()
+    +void register(Observer observer)
+    +void unregister(Observer observer)
+    +void notify_observer()
+    +void setOn(boolean on)
+    +boolean isOn()
+    +String getVisualization()
+    +String toString()
+    +void setSteam(boolean steam)
+    +boolean isSteam()
+}
+
+class CoffeeMachineControllerImpl extends CoffeeMachineController{
+    #String m_sDebugMessage =""
+    +void OnDebugMessage(String str)
+    +void set_on()
+    +void set_off()
+    +CoffeeMachineModel getCoffee_machine_model()
+    +void set_heater_on()
+    +void set_heater_off()
+    +boolean set_time(int seconds)
+    +void sub_time()
+    +void set_mode_coffee()
+    +void set_mode_steam_water()
+    +void set_mode_neutral()
+    +void set_pump_on()
+    +void set_pump_off()
+    +void set_water()
+    +void set_steam()
+}
+
+class CoffeeMachineSequences {
+}
+
+class CoffeeMachineView extends javax.swing.JFrame implements Observer {
+    -CoffeeMachineControllerImpl m_CMC = new CoffeeMachineControllerImpl
+    -javax.swing.JToolBar m_ToolBar
+    -javax.swing.JToolBar m_ToolBar1
+    -javax.swing.JTextArea m_DebugOutputTextBox
+    -int m_nEventCounter = 0
+    -javax.swing.JScrollPane jScrollPane1
+    -javax.swing.JScrollPane jScrollPane2
+    -javax.swing.JSplitPane jSplitPane1
+    -javax.swing.JTextField m_jTextField
+    -boolean timer_active = true
+
+    +{static} void main(String[] args)
+    +void initComponents()
+    +void UpdateDisplay()
+    +void update(Observable observable)
+}
+
+interface Observable <<interface>> {
+	~void register(Observer observer)
+	~void unregister(Observer observer)
+	~void notify_observer()
+	~String getVisualization()
+}
+
+interface Observer <<interface>> {
+    ~void update(Observable observable)
+}
+
+interface IRegion <<interface>> {
+    ~String getName();
+    ~IState[] getStates();
+    ~IState getCurrentState();
+}
+
+interface IState <<interface>> {
+    ~String getName();
+    ~TStateId getId();
+    ~IRegion[] getRegions();
+}
+
+enum EMode <<enumeration>> {
+    NEUTRAL
+    COFFEE
+    STEAM_WATER
+}
+
+enum TStateId <<enumeration>> {
+    CoffeeMachine_Root
+    CoffeeMachine_Region1_Operating
+    CoffeeMachine_Region1_Operating_Region2_Mode_Neutral
+    CoffeeMachine_Region1_Operating_Region2_Mode_Coffee
+    CoffeeMachine_Region1_Operating_Region2_Mode_Steam_Water
+    CoffeeMachine_Region1_Operating_Region3_Heating
+    CoffeeMachine_Region1_Operating_Region3_Waiting
+    CoffeeMachine_Region1_Operating_Region3_Off
+    CoffeeMachine_Region1_Operating_Region3_Pumping
+    CoffeeMachine_Region1_Operating_Region4_Mode_Steam
+    CoffeeMachine_Region1_Operating_Region4_Mode_Water
+    CoffeeMachine_Region1_NotImplemented
+}
+
+CoffeeMachineController -> CoffeeMachineModel
+CoffeeMachineModel ..> Observer
+
+
+
+@enduml
