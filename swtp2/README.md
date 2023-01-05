@@ -36,6 +36,8 @@ GasPump -> User: cardOut
 @enduml
 ```
 
+<br>
+
 ```plantuml
 @startuml
 hide empty description
