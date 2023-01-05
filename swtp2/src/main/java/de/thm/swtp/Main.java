@@ -5,6 +5,7 @@ import de.thm.swtp.statediagram.StateDiagramTransformer;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.sequencediagram.*;
+import org.apache.commons.cli.*;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -39,17 +40,61 @@ public class Main {
     }
 
     public static void main(String[] args) throws IOException {
-        var classDiagramCode = readFile("./classdiagram.plantuml");
-        var sequenceDiagramCode = readFile("./input.plantuml");
+        var options = new Options()
+                .addOption(Option.builder("s")
+                        .longOpt("sequenceDiagram")
+                        .hasArg()
+                        .desc("The sequence diagram to transform to a sate diagram.")
+                        .argName("path")
+                        .required()
+                        .build())
+                .addOption(Option.builder("c")
+                        .longOpt("classDiagram")
+                        .hasArg()
+                        .desc("The class diagram to ensure coherence with.")
+                        .argName("path")
+                        .build())
+                .addOption(Option.builder("o")
+                        .longOpt("output")
+                        .hasArg()
+                        .desc("Path to write the generated state diagram to.")
+                        .argName("path")
+                        .required()
+                        .build())
+                .addOption(Option.builder("p")
+                        .longOpt("targetParticipant")
+                        .hasArg()
+                        .desc("Every event in the sequence diagram that does not deal with this participant will be ignored.")
+                        .argName("name")
+                        .required()
+                        .build());
 
-        var classDiagram = (ClassDiagram) new SourceStringReader(classDiagramCode).getBlocks().get(0).getDiagram();
-        var sequenceDiagram = (SequenceDiagram) new SourceStringReader(sequenceDiagramCode).getBlocks().get(0).getDiagram();
+        var optionParser = new DefaultParser();
 
-        var classDiagramReader = new ClassDiagramValidator(classDiagram, sequenceDiagram);
-        var stateDiagramTransformer = new StateDiagramTransformer(sequenceDiagram, "CoffeeMachineControllerImpl");
+        try {
+            var opt = optionParser.parse(options, args);
 
-        classDiagramReader.validate();
+            var sequenceDiagramPath = opt.getOptionValue("sequenceDiagram");
+            var classDiagramPath = opt.getOptionValue("classDiagram");
+            var outputPath = opt.getOptionValue("output", null);
+            var targetParticipant = opt.getOptionValue("targetParticipant");
 
-        writeFile("./test.plantuml", stateDiagramTransformer.transform().toString());
+            var sequenceDiagramCode = readFile(sequenceDiagramPath);
+            var sequenceDiagram = (SequenceDiagram) new SourceStringReader(sequenceDiagramCode).getBlocks().get(0).getDiagram();
+
+            if (classDiagramPath != null) {
+                var classDiagramCode = readFile(classDiagramPath);
+                var classDiagram = (ClassDiagram) new SourceStringReader(classDiagramCode).getBlocks().get(0).getDiagram();
+                var classDiagramReader = new ClassDiagramValidator(classDiagram, sequenceDiagram);
+                classDiagramReader.validate();
+            }
+
+            var stateDiagramTransformer = new StateDiagramTransformer(sequenceDiagram, targetParticipant);
+
+            writeFile(outputPath, stateDiagramTransformer.transform().toString());
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+            new HelpFormatter().printHelp("transformer.jar args...", options);
+        }
     }
 }
