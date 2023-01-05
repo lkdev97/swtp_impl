@@ -44,7 +44,7 @@ public class Main {
         System.exit(1);
     }
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) {
         var options = new Options()
                 .addOption(Option.builder("s")
                         .longOpt("sequenceDiagram")
