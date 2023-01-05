@@ -3,6 +3,7 @@ package de.thm.swtp.statediagram;
 import net.sourceforge.plantuml.sequencediagram.*;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 /**
  * Transforms a given sequence diagram into a semantically equivalent state diagram.
@@ -218,14 +219,20 @@ public class StateDiagramTransformer {
      * @return The generated state diagram.
      */
     public DiagramNode transform() {
-        targetParticipant = sequenceDiagram.participants()
-                .stream()
-                .filter(p -> p.getCode().equals(targetParticipantName))
-                .findFirst()
-                .orElseThrow();
-        eventIterator = sequenceDiagram.events().iterator();
-        nextEvent();
+        try {
+            targetParticipant = sequenceDiagram.participants()
+                    .stream()
+                    .filter(p -> p.getCode().equals(targetParticipantName))
+                    .findFirst()
+                    .orElseThrow();
+            eventIterator = sequenceDiagram.events().iterator();
+            nextEvent();
 
-        return generateDiagram();
+            return generateDiagram();
+        } catch (NoSuchElementException e) {
+            System.out.println("Could not find participant with name " + targetParticipantName);
+            System.exit(1);
+            return null;
+        }
     }
 }

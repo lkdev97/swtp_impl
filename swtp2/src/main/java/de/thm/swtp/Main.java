@@ -39,6 +39,11 @@ public class Main {
         }
     }
 
+    private static void error(String message) {
+        System.out.println("Error: " + message);
+        System.exit(1);
+    }
+
     public static void main(String[] args) throws IOException {
         var options = new Options()
                 .addOption(Option.builder("s")
@@ -79,18 +84,39 @@ public class Main {
             var outputPath = opt.getOptionValue("output", null);
             var targetParticipant = opt.getOptionValue("targetParticipant");
 
-            var sequenceDiagramCode = readFile(sequenceDiagramPath);
-            var sequenceDiagram = (SequenceDiagram) new SourceStringReader(sequenceDiagramCode).getBlocks().get(0).getDiagram();
+            String sequenceDiagramCode = null;
+            try {
+                sequenceDiagramCode = readFile(sequenceDiagramPath);
+            } catch (IllegalStateException e) {
+                error("Could not open file " + sequenceDiagramPath);
+            }
+            SequenceDiagram sequenceDiagram = null;
+            try {
+                assert sequenceDiagramCode != null;
+                sequenceDiagram = (SequenceDiagram) new SourceStringReader(sequenceDiagramCode).getBlocks().get(0).getDiagram();
+            } catch (ClassCastException e) {
+                error("PlantUML failed to parse given sequence diagram. Make sure it does not contain any syntax errors.");
+            }
 
             if (classDiagramPath != null) {
-                var classDiagramCode = readFile(classDiagramPath);
-                var classDiagram = (ClassDiagram) new SourceStringReader(classDiagramCode).getBlocks().get(0).getDiagram();
+                String classDiagramCode = null;
+                try {
+                    classDiagramCode = readFile(classDiagramPath);
+                } catch (IllegalStateException e) {
+                    error("Could not open file " + classDiagramCode);
+                }
+                ClassDiagram classDiagram = null;
+                try {
+                    assert classDiagramCode != null;
+                    classDiagram = (ClassDiagram) new SourceStringReader(classDiagramCode).getBlocks().get(0).getDiagram();
+                } catch (ClassCastException e) {
+                    error("PlantUML failed to parse given class diagram. Make sure it does not contain any syntax errors.");
+                }
                 var classDiagramReader = new ClassDiagramValidator(classDiagram, sequenceDiagram);
                 classDiagramReader.validate();
             }
 
             var stateDiagramTransformer = new StateDiagramTransformer(sequenceDiagram, targetParticipant);
-
             writeFile(outputPath, stateDiagramTransformer.transform().toString());
         } catch (ParseException e) {
             System.out.println(e.getMessage());
