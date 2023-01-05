@@ -36,4 +36,34 @@ GasPump -> User: cardOut
 @enduml
 ```
 
-![demo](./demo.png)
+```plantuml
+@startuml
+hide empty description
+state GasPump {
+[*] --> S1
+S1 --> S2: insertCard
+S2 --> S3: / requestPin
+S3 --> S4: pinCode
+S4 --> S5: / validate
+S5 --> S6: result(pinOK)
+state S6 {
+[*] --> S8
+S8 --> S10: pinOk
+state S10 {
+[*] --> S12: / startFuel
+S12 --> S13: hangUp
+S13 --> [*]
+}
+S10 --> [*]
+S8 --> S15: !pinOk
+state S15 {
+[*] --> S17: / invalidPin
+S17 --> [*]
+}
+S15 --> [*]
+}
+S6 --> S19: / cardOut
+S19 --> [*]
+}
+@enduml
+```
