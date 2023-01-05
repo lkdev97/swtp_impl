@@ -4,6 +4,9 @@ import net.sourceforge.plantuml.sequencediagram.*;
 
 import java.util.Iterator;
 
+/**
+ * Transforms a given sequence diagram into a semantically equivalent state diagram.
+ */
 public class StateDiagramTransformer {
 
     private final SequenceDiagram sequenceDiagram;
@@ -12,11 +15,20 @@ public class StateDiagramTransformer {
     private Event currentEvent;
     private Participant targetParticipant;
 
+    /**
+     * Creates a new StateDiagramTransformer which transformers the given sequence diagram into a semantically
+     * equivalent state diagram.
+     * @param sequenceDiagram The sequence diagram to be transformed.
+     * @param targetParticipantName All messages that do not deal with this participant will be ignored.
+     */
     public StateDiagramTransformer(SequenceDiagram sequenceDiagram, String targetParticipantName) {
         this.sequenceDiagram = sequenceDiagram;
         this.targetParticipantName = targetParticipantName;
     }
 
+    /**
+     * Reads the next event of the provided sequence diagram.
+     */
     private void nextEvent() {
         if (eventIterator.hasNext()) {
             currentEvent = eventIterator.next();
@@ -25,6 +37,11 @@ public class StateDiagramTransformer {
         }
     }
 
+    /**
+     * Generates state diagram for a sequence diagram message (par1 --> par2: trigger).
+     * @param target The state node to append to.
+     * @return The next state node to append to.
+     */
     private StateNode generateMessage(StateNode target) {
         var m = (Message) currentEvent;
 
@@ -44,6 +61,10 @@ public class StateDiagramTransformer {
         }
     }
 
+    /**
+     * Generates the next state node based on the current event.
+     * @return A newly generated state node.
+     */
     private StateNode generateState() {
         if (currentEvent instanceof GroupingStart g) {
             return switch (g.getTitle()) {
@@ -57,6 +78,10 @@ public class StateDiagramTransformer {
         }
     }
 
+    /**
+     * Generates state diagram for a sequence diagram loop block (loop [con] [events] end).
+     * @return The next state node to append to.
+     */
     private StateNode generateLoop() {
         var outerWrapperState = new MultiStateNode();
         var outerStartState = new StateNode(true, false);
@@ -87,6 +112,10 @@ public class StateDiagramTransformer {
         return outerWrapperState;
     }
 
+    /**
+     * Generates state diagram for a sequence diagram opt block (opt [con] [events] end).
+     * @return The next state node to append to.
+     */
     private StateNode generateOpt() {
         var wrapperState = new MultiStateNode();
         var startState = new StateNode(true, false);
@@ -102,6 +131,11 @@ public class StateDiagramTransformer {
         return wrapperState;
     }
 
+    /**
+     * Generates a new state node and appends it to the given target state node.
+     * @param target The state node to append the newly generated state to.
+     * @return The next state node to append to.
+     */
     private StateNode generate(StateNode target) {
         if (currentEvent instanceof Message) {
             return generateMessage(target);
@@ -112,6 +146,11 @@ public class StateDiagramTransformer {
         }
     }
 
+    /**
+     * Generates a single branch of an alt or opt block.
+     * @param baseState The state to append this branch to.
+     * @param endState The next state to append to.
+     */
     private void generateBranch(StateNode baseState, StateNode endState) {
         var branchState = new MultiStateNode();
         var currentState = new StateNode(true, false);
@@ -130,6 +169,10 @@ public class StateDiagramTransformer {
         branchState.addEmptyEdge(endState);
     }
 
+    /**
+     * Generates state diagram for a sequence diagram alt block.
+     * @return The next state to append to.
+     */
     private StateNode generateAlt() {
         var wrapperState = new MultiStateNode();
 
@@ -148,6 +191,10 @@ public class StateDiagramTransformer {
         return wrapperState;
     }
 
+    /**
+     * Generates a new state diagram based on the given sequence diagram.
+     * @return The generated state diagram.
+     */
     private DiagramNode generateDiagram() {
         var startState = new StateNode(true, false);
         var idleState = new StateNode();
@@ -166,6 +213,10 @@ public class StateDiagramTransformer {
         return stateDiagram;
     }
 
+    /**
+     * Transforms the given sequence diagram to a state diagram and returns it.
+     * @return The generated state diagram.
+     */
     public DiagramNode transform() {
         targetParticipant = sequenceDiagram.participants()
                 .stream()

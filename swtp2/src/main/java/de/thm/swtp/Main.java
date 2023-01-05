@@ -12,6 +12,11 @@ import java.nio.file.Paths;
 
 public class Main {
 
+    /**
+     * Reads a file and returns its content.
+     * @param path Path of the file.
+     * @return The file's content.
+     */
     private static String readFile(String path) {
         try {
             return Files.readString(Paths.get(path));
@@ -20,6 +25,11 @@ public class Main {
         }
     }
 
+    /**
+     * Writes string to a file it created.
+     * @param path Path of the file to create and write to.
+     * @param content Content to be written.
+     */
     private static void writeFile(String path, String content) {
         try {
             Files.writeString(Paths.get(path), content);
