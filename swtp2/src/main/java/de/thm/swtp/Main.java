@@ -2,11 +2,15 @@ package de.thm.swtp;
 
 import de.thm.swtp.classdiagram.ClassDiagramValidator;
 import de.thm.swtp.statediagram.StateDiagramTransformer;
+import net.sourceforge.plantuml.FileFormat;
+import net.sourceforge.plantuml.FileFormatOption;
 import net.sourceforge.plantuml.SourceStringReader;
 import net.sourceforge.plantuml.classdiagram.ClassDiagram;
 import net.sourceforge.plantuml.sequencediagram.*;
 import org.apache.commons.cli.*;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -72,6 +76,11 @@ public class Main {
                         .desc("Every event in the sequence diagram that does not deal with this participant will be ignored.")
                         .argName("name")
                         .required()
+                        .build())
+                .addOption(Option.builder("outputType")
+                        .hasArg()
+                        .desc("The format in which the state diagram should be emitted. Can be either 'image' or 'uml'.")
+                        .argName("type")
                         .build());
 
         var optionParser = new DefaultParser();
@@ -83,6 +92,11 @@ public class Main {
             var classDiagramPath = opt.getOptionValue("classDiagram");
             var outputPath = opt.getOptionValue("output", null);
             var targetParticipant = opt.getOptionValue("targetParticipant");
+            var outputType = opt.getOptionValue("outputType", "uml");
+
+            if (!outputType.equals("uml") && !outputType.equals("image")) {
+                error("Invalid output type. Must be either 'image' or 'uml'.");
+            }
 
             String sequenceDiagramCode = null;
             try {
@@ -117,10 +131,20 @@ public class Main {
             }
 
             var stateDiagramTransformer = new StateDiagramTransformer(sequenceDiagram, targetParticipant);
-            writeFile(outputPath, stateDiagramTransformer.transform().toString());
+
+            if (outputType.equals("uml")) {
+                writeFile(outputPath, stateDiagramTransformer.transform().toString());
+            } else {
+                var reader = new SourceStringReader(stateDiagramTransformer.transform().toString());
+                var output = new FileOutputStream(outputPath);
+                reader.outputImage(output, new FileFormatOption(FileFormat.PNG));
+                output.close();
+            }
         } catch (ParseException e) {
             System.out.println(e.getMessage());
             new HelpFormatter().printHelp("transformer.jar args...", options);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }
