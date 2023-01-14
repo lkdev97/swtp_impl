@@ -19,7 +19,8 @@ public class StateDiagramTransformer {
     /**
      * Creates a new StateDiagramTransformer which transformers the given sequence diagram into a semantically
      * equivalent state diagram.
-     * @param sequenceDiagram The sequence diagram to be transformed.
+     *
+     * @param sequenceDiagram       The sequence diagram to be transformed.
      * @param targetParticipantName All messages that do not deal with this participant will be ignored.
      */
     public StateDiagramTransformer(SequenceDiagram sequenceDiagram, String targetParticipantName) {
@@ -40,6 +41,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates state diagram for a sequence diagram message (par1 --> par2: trigger).
+     *
      * @param target The state node to append to.
      * @return The next state node to append to.
      */
@@ -47,23 +49,21 @@ public class StateDiagramTransformer {
         var m = (Message) currentEvent;
 
         nextEvent();
-        if (m.dealWith(targetParticipant)) {
-            var trigger = m.getLabel().get(0).toString();
-            if (m.getParticipant1().equals(targetParticipant)) {
-                trigger = String.format("/ %s", trigger);
-            }
 
-            var s = generateState();
-            target.addEdge(trigger, s);
-
-            return s;
-        } else {
-            return target;
+        var trigger = m.getLabel().get(0).toString();
+        if (m.getParticipant1().equals(targetParticipant)) {
+            trigger = String.format("/ %s", trigger);
         }
+
+        var s = generateState();
+        target.addEdge(trigger, s);
+
+        return s;
     }
 
     /**
      * Generates the next state node based on the current event.
+     *
      * @return A newly generated state node.
      */
     private StateNode generateState() {
@@ -72,7 +72,8 @@ public class StateDiagramTransformer {
                 case "alt" -> generateAlt();
                 case "loop" -> generateLoop();
                 case "opt" -> generateOpt();
-                default -> throw new IllegalStateException(String.format("Group type %s not implemented", g.getTitle()));
+                default ->
+                        throw new IllegalStateException(String.format("Group type %s not implemented", g.getTitle()));
             };
         } else {
             return new StateNode();
@@ -81,6 +82,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates state diagram for a sequence diagram loop block (loop [con] [events] end).
+     *
      * @return The next state node to append to.
      */
     private StateNode generateLoop() {
@@ -115,6 +117,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates state diagram for a sequence diagram opt block (opt [con] [events] end).
+     *
      * @return The next state node to append to.
      */
     private StateNode generateOpt() {
@@ -134,6 +137,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates a new state node and appends it to the given target state node.
+     *
      * @param target The state node to append the newly generated state to.
      * @return The next state node to append to.
      */
@@ -149,8 +153,9 @@ public class StateDiagramTransformer {
 
     /**
      * Generates a single branch of an alt or opt block.
+     *
      * @param baseState The state to append this branch to.
-     * @param endState The next state to append to.
+     * @param endState  The next state to append to.
      */
     private void generateBranch(StateNode baseState, StateNode endState) {
         var branchState = new MultiStateNode();
@@ -172,6 +177,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates state diagram for a sequence diagram alt block.
+     *
      * @return The next state to append to.
      */
     private StateNode generateAlt() {
@@ -194,6 +200,7 @@ public class StateDiagramTransformer {
 
     /**
      * Generates a new state diagram based on the given sequence diagram.
+     *
      * @return The generated state diagram.
      */
     private DiagramNode generateDiagram() {
@@ -216,6 +223,7 @@ public class StateDiagramTransformer {
 
     /**
      * Transforms the given sequence diagram to a state diagram and returns it.
+     *
      * @return The generated state diagram.
      */
     public DiagramNode transform() {
