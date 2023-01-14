@@ -17,7 +17,7 @@ public class StateNode extends Node {
     private final ArrayList<Edge> edges = new ArrayList<>();
 
     // Holds next state ID. Increased in constructor.
-    protected static int stateId = 0;
+    public static int stateIdCounter = 0;
 
     /**
      * Creates a new state node.
@@ -32,7 +32,7 @@ public class StateNode extends Node {
      * @param endState Whether this state is an end state.
      */
     public StateNode(boolean startState, boolean endState) {
-        this.id = stateId++;
+        this.id = stateIdCounter++;
         this.startState = startState;
         this.endState = endState;
     }
