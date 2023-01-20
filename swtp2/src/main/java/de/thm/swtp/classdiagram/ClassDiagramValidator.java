@@ -82,6 +82,10 @@ public class ClassDiagramValidator {
                     error(m, String.format("Class %s does not exist.", m.getParticipant2().getCode()));
                 }
 
+                if (m.getLabel().get(0).toString().contains(".")) {
+                    continue;
+                }
+
                 var clazz = classes.get(m.getParticipant2().getCode());
                 var methodName = extractMethodName(m.getLabel().get(0).toString());
                 if (!clazz.existsMethod(methodName)) {
