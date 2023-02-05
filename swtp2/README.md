@@ -1,4 +1,13 @@
-# SWTP
+# Projektbericht
+## Ableitung von UML-Zustandsdiagrammen aus UML-Sequenzdiagrammen
+
+Softwaretechnik-Projekt  
+Wintersemester 22/23  
+**Gruppe 1:** Oskar Arlt, Julian Deiß, Christian Graber, Lars Köhler
+
+<hr>
+
+
 This repository contains the source code of a tool designed to convert [PlantUML](https://plantuml.com/) sequence
 diagrams to semantically analogous state diagrams.
 
@@ -17,6 +26,9 @@ diagrams to semantically analogous state diagrams.
 4. Open the project folder (`swtp2`) inside the cloned repository (`File->Open Folder...`).
 5. Install the following extensions: `Extension Pack for Java`, `Gradle for Java`
 6. Open `Main.java` and press the `Run` button above the `main` method to compile and run the project.
+
+## Generating a Jar-File
+The Gradle-Plugin `shadowJar` has been configured for this project. To generate a jar-file containing all dependencies, execute `./gradlew shadowJar` in this directory. The generated jar-file can be found in `build/libs`.
 
 ## Demo
 ```plantuml
